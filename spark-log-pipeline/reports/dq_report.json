@@ -1,0 +1,51 @@
+{
+  "schema_ok": false,
+  "missing_fields": [],
+  "extra_fields": [
+    "request_id"
+  ],
+  "type_mismatches": [
+    {
+      "field": "response_time_ms",
+      "expected": "long",
+      "actual": "bigint"
+    },
+    {
+      "field": "user_id",
+      "expected": "string",
+      "actual": "bigint"
+    }
+  ],
+  "nullable_mismatches": [
+    {
+      "field": "timestamp",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "field": "service",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "field": "level",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "field": "response_time_ms",
+      "expected": false,
+      "actual": true
+    }
+  ],
+  "dq": {
+    "total_rows": 1000000,
+    "null_counts": {
+      "service_nulls": 982,
+      "response_time_ms_nulls": 2017
+    },
+    "negative_response_time_count": 0,
+    "response_time_over_10s_count": 0,
+    "invalid_level_count": 0
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "fields": [
+    {"name": "timestamp", "type": "string", "nullable": false},
+    {"name": "service", "type": "string", "nullable": false},
+    {"name": "level", "type": "string", "nullable": false},
+    {"name": "response_time_ms", "type": "long", "nullable": false},
+    {"name": "user_id", "type": "string", "nullable": true}
+  ]
+}
