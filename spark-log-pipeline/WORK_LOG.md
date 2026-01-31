@@ -185,6 +185,11 @@
 - `BashOperator`로 파이프라인 실행
 - 태그: `spark`, `quality`, `catalog`
 
+#### 5. 엔트리포인트 리팩토링 (`main.py`)
+- `pipeline.py`의 `run_pipeline()` 래핑
+- 4줄로 간소화된 thin wrapper
+- `SystemExit`으로 exit code 전달
+
 ---
 
 ## 사용된 Spark 기능 요약
