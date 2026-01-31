@@ -1,5 +1,7 @@
 {
   "schema_ok": true,
+  "schema_version": "v1",
+  "schema_path": "schemas/expected_schema.json",
   "missing_fields": [],
   "extra_fields": [],
   "type_mismatches": [],

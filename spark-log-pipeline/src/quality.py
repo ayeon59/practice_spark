@@ -2,12 +2,10 @@ import json
 from pyspark.sql.types import StructType
 from pyspark.sql import functions as F
 
-#schemas/expected_schema.json 같은 파일을 열어서 dict로 반환
 def _load_expected_schema(path: str) -> dict:
     with open(path, "r") as f:
         return json.load(f)
 
-#Spark 스키마(StructType)를 비교하기 쉬운 dict로 바꿈:
 def _schema_to_dict(schema: StructType) -> dict:
     return {
         field.name: {
@@ -20,6 +18,8 @@ def _schema_to_dict(schema: StructType) -> dict:
 def run_quality_checks(df, schema_path: str = "schemas/expected_schema.json") -> dict:
     """Run schema validation + DQ checks. Return a report dict."""
     expected = _load_expected_schema(schema_path)
+    schema_version = expected.get("version", "unknown")
+
     expected_fields = {
         f["name"]: {"type": f["type"], "nullable": f["nullable"]}
         for f in expected.get("fields", [])
@@ -80,6 +80,8 @@ def run_quality_checks(df, schema_path: str = "schemas/expected_schema.json") ->
 
     return {
         "schema_ok": schema_ok,
+        "schema_version": schema_version,
+        "schema_path": schema_path,
         "missing_fields": missing_fields,
         "extra_fields": extra_fields,
         "type_mismatches": type_mismatches,

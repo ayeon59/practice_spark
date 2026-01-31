@@ -10,11 +10,12 @@ def _schema_to_list(schema):
         for f in schema.fields
     ]
 
-def build_catalog(raw_df, metrics_df, input_path: str, output_path: str) -> dict:
+def build_catalog(raw_df, metrics_df, input_path: str, output_path: str, schema_version: str = "unknown") -> dict:
     return {
         "dataset_name": "service_metrics",
         "description": "Service-level aggregated metrics from raw application logs.",
         "created_at": datetime.utcnow().isoformat() + "Z",
+        "schema_version": schema_version,
         "input": {
             "path": input_path,
             "format": "jsonl"

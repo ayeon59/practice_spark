@@ -135,6 +135,12 @@
 - 스키마 버전 관리 필드 추가 (`version: "v1"`)
 - 타입 및 nullable 속성 실제 데이터 기준으로 보정
 
+#### 4. 스키마 버전 추적 연동
+- `quality.py`: 스키마 파일에서 version 읽어서 리포트에 포함
+- `catalog.py`: schema_version 파라미터 추가
+- `main.py`: quality → catalog로 스키마 버전 전달
+- 리포트 간 스키마 버전 일관성 확보 (`dq_report.json`, `catalog.json`)
+
 **실행 결과:**
 - `schema_ok: true` - 스키마 검증 통과
 - `quality_passed: true` - 품질 검사 통과

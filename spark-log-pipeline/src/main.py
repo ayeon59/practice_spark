@@ -71,7 +71,7 @@ def main():
     metrics = build_metrics(df)
     save_metrics(metrics, output_path)
 
-    catalog = build_catalog(df, metrics, input_path, output_path)
+    catalog = build_catalog(df, metrics, input_path, output_path, schema_version=report.get("schema_version", "unknown"))
     with open("reports/catalog.json", "w") as f:
         json.dump(catalog, f, indent=2)
 
