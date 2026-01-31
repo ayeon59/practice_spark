@@ -6,9 +6,10 @@ from pyspark.sql import SparkSession, functions as F
 
 from ingestion import load_raw
 from quality import run_quality_checks
-from transform import build_metrics
+from transform import build_metrics, build_user_metrics
 from load import save_metrics
 from catalog import build_catalog
+from rdb import load_users_pg
 from state import load_watermark, save_watermark
 
 NULL_RATE_THRESHOLD = 0.005  # 0.5%
@@ -57,6 +58,7 @@ def _evaluate_quality(report: dict) -> dict:
 def run_pipeline(
     input_path: str = "data/raw/logs.jsonl",
     output_path: str = "data/processed/service_metrics",
+    user_output_path: str = "data/processed/user_metrics",
     schema_path: str = "schemas/expected_schema.json",
     reports_dir: str = "reports",
     state_path: str = "state/last_run.json",
@@ -66,6 +68,7 @@ def run_pipeline(
     spark = (
         SparkSession.builder
         .appName("spark-log-pipeline")
+        .config("spark.jars.packages", "org.postgresql:postgresql:42.7.4")
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("WARN")
@@ -91,6 +94,9 @@ def run_pipeline(
 
         metrics = _run_step("transform", lambda: build_metrics(df))
         _run_step("load", lambda: save_metrics(metrics, output_path))
+        users_df = _run_step("rdb_load", lambda: load_users_pg(spark))
+        user_metrics = _run_step("user_transform", lambda: build_user_metrics(df, users_df))
+        _run_step("user_load", lambda: save_metrics(user_metrics, user_output_path))
 
         catalog = _run_step(
             "catalog",

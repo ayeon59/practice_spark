@@ -192,6 +192,39 @@
 
 ---
 
+### Phase 6: 외부 RDB 연동 및 사용자 메트릭
+
+**추가된 파일:**
+
+| 파일 | 역할 |
+|------|------|
+| `src/rdb.py` | PostgreSQL JDBC 연동 모듈 |
+
+**구현 내용:**
+
+#### 1. PostgreSQL JDBC 연동 (`rdb.py`)
+- 환경변수 기반 DB 접속 설정 (`PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`)
+- `spark.read.format("jdbc")`로 테이블 로드
+- PostgreSQL 드라이버: `org.postgresql:postgresql:42.7.4`
+
+#### 2. 사용자 메트릭 집계 (`transform.py`)
+- `build_user_metrics()` 함수 추가
+- 로그 DataFrame과 users 테이블 **LEFT JOIN** (`on="user_id"`)
+- 사용자 플랜(plan)별 메트릭 집계:
+  - 총 로그 수
+  - 평균 응답 시간
+  - 에러 카운트 및 에러율
+
+#### 3. 파이프라인 확장 (`pipeline.py`)
+- JDBC 드라이버 config 추가 (`spark.jars.packages`)
+- 새 단계 추가:
+  - `rdb_load`: PostgreSQL에서 users 테이블 로드
+  - `user_transform`: 사용자별 메트릭 집계
+  - `user_load`: 결과 저장 (`data/processed/user_metrics`)
+- `user_output_path` 파라미터 추가
+
+---
+
 ## 사용된 Spark 기능 요약
 
 | 카테고리 | 기능 |
@@ -203,6 +236,8 @@
 | 조건 처리 | `F.col()`, `F.expr()`, `cast()`, `isNull()`, `isin()` |
 | 저장 | `write.mode().parquet()` |
 | 스키마 | `df.schema`, `StructType`, `printSchema()` |
+| JDBC | `spark.read.format("jdbc")`, PostgreSQL 연동 |
+| 조인 | `df.join()`, LEFT JOIN |
 
 ---
 
