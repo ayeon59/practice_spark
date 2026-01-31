@@ -149,6 +149,44 @@
 
 ---
 
+### Phase 5: 파이프라인 오케스트레이션 및 증분 처리
+
+**추가된 파일:**
+
+| 파일 | 역할 |
+|------|------|
+| `src/pipeline.py` | 파이프라인 오케스트레이션 (메인 실행 모듈) |
+| `src/state.py` | Watermark 기반 상태 관리 |
+| `airflow/dags/log_pipeline_dag.py` | Airflow DAG 정의 |
+
+**구현 내용:**
+
+#### 1. 파이프라인 오케스트레이션 (`pipeline.py`)
+- `run_pipeline()` 함수로 전체 흐름 통합
+- **단계별 실행 로깅**: `_run_step()` - 각 단계 시작/종료 시간 출력
+- **경로 파라미터화**: input/output/schema/reports 경로 설정 가능
+- **증분 처리**: watermark 기반으로 새 데이터만 처리
+- **조기 종료**: 새 데이터 없으면 즉시 종료
+- **exit code 반환**: 성공(0), 실패(1)
+
+#### 2. 상태 관리 (`state.py`)
+- `load_watermark()`: 마지막 처리 timestamp 로드
+- `save_watermark()`: 처리 완료 후 timestamp 저장
+- 파일 기반 상태 저장 (`state/last_run.json`)
+
+#### 3. 증분 처리 지원 (`ingestion.py`)
+- `since_ts` 파라미터 추가
+- `F.to_timestamp()`로 문자열 → timestamp 변환
+- watermark 이후 데이터만 필터링
+
+#### 4. Airflow 스케줄링 (`airflow/dags/`)
+- DAG ID: `spark_log_pipeline`
+- 스케줄: `@daily`
+- `BashOperator`로 파이프라인 실행
+- 태그: `spark`, `quality`, `catalog`
+
+---
+
 ## 사용된 Spark 기능 요약
 
 | 카테고리 | 기능 |
