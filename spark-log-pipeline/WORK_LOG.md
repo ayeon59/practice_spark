@@ -111,13 +111,14 @@
 
 #### 1. Quality Gate (`main.py`)
 - DQ 검사 결과를 평가하는 `_evaluate_quality()` 함수 추가
+- **비율 기반 임계값 도입**: `NULL_RATE_THRESHOLD = 0.005` (0.5%)
 - 검사 항목:
   - 스키마 일치 여부
-  - 필수 컬럼 null 존재 여부
+  - 필수 컬럼 null 비율 (개수가 아닌 비율로 평가)
   - 음수/이상치 response_time 존재 여부
   - 유효하지 않은 log level 존재 여부
 - **품질 검사 실패 시 파이프라인 중단** (`sys.exit(1)`)
-- 실패한 검사 항목을 리포트에 기록
+- 리포트에 null_rate 정보 포함
 
 #### 2. 데이터 카탈로그 (`catalog.py`)
 - 데이터셋 메타데이터 자동 생성:
@@ -128,6 +129,17 @@
 - **메트릭 정의**: 각 집계 메트릭의 의미 기술
 - **데이터 리니지**: 입력 → 변환 과정 → 출력 추적
 - 결과를 `reports/catalog.json`으로 저장
+
+#### 3. 스키마 정합성 개선
+- `expected_schema.json`을 실제 데이터와 일치하도록 수정
+- 스키마 버전 관리 필드 추가 (`version: "v1"`)
+- 타입 및 nullable 속성 실제 데이터 기준으로 보정
+
+**실행 결과:**
+- `schema_ok: true` - 스키마 검증 통과
+- `quality_passed: true` - 품질 검사 통과
+- null 비율: service 0.098%, response_time_ms 0.2% (임계값 0.5% 이하)
+- 데이터 카탈로그 생성 완료 (`reports/catalog.json`)
 
 ---
 

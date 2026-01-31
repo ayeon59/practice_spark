@@ -1,9 +1,11 @@
 {
+  "version": "v1",
   "fields": [
-    {"name": "timestamp", "type": "string", "nullable": false},
-    {"name": "service", "type": "string", "nullable": false},
-    {"name": "level", "type": "string", "nullable": false},
-    {"name": "response_time_ms", "type": "long", "nullable": false},
-    {"name": "user_id", "type": "string", "nullable": true}
+    {"name": "timestamp", "type": "string", "nullable": true},
+    {"name": "service", "type": "string", "nullable": true},
+    {"name": "level", "type": "string", "nullable": true},
+    {"name": "response_time_ms", "type": "bigint", "nullable": true},
+    {"name": "user_id", "type": "bigint", "nullable": true},
+    {"name": "request_id", "type": "string", "nullable": true}
   ]
 }

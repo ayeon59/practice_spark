@@ -1,0 +1,117 @@
+{
+  "dataset_name": "service_metrics",
+  "description": "Service-level aggregated metrics from raw application logs.",
+  "created_at": "2026-01-31T07:07:50.973208Z",
+  "input": {
+    "path": "data/raw/logs.jsonl",
+    "format": "jsonl"
+  },
+  "output": {
+    "path": "data/processed/service_metrics",
+    "format": "parquet"
+  },
+  "raw_schema": [
+    {
+      "name": "level",
+      "type": "string",
+      "nullable": true
+    },
+    {
+      "name": "request_id",
+      "type": "string",
+      "nullable": true
+    },
+    {
+      "name": "response_time_ms",
+      "type": "bigint",
+      "nullable": true
+    },
+    {
+      "name": "service",
+      "type": "string",
+      "nullable": true
+    },
+    {
+      "name": "timestamp",
+      "type": "string",
+      "nullable": true
+    },
+    {
+      "name": "user_id",
+      "type": "bigint",
+      "nullable": true
+    }
+  ],
+  "processed_schema": [
+    {
+      "name": "service",
+      "type": "string",
+      "nullable": true
+    },
+    {
+      "name": "total_logs",
+      "type": "bigint",
+      "nullable": false
+    },
+    {
+      "name": "avg_response_time_ms",
+      "type": "double",
+      "nullable": true
+    },
+    {
+      "name": "p95_response_time_ms",
+      "type": "bigint",
+      "nullable": true
+    },
+    {
+      "name": "error_count",
+      "type": "bigint",
+      "nullable": true
+    },
+    {
+      "name": "error_rate",
+      "type": "double",
+      "nullable": true
+    }
+  ],
+  "metrics": [
+    {
+      "name": "total_logs",
+      "description": "Count of logs per service"
+    },
+    {
+      "name": "avg_response_time_ms",
+      "description": "Average response time per service"
+    },
+    {
+      "name": "p95_response_time_ms",
+      "description": "95th percentile response time per service"
+    },
+    {
+      "name": "error_count",
+      "description": "Number of ERROR logs per service"
+    },
+    {
+      "name": "error_rate",
+      "description": "Error count divided by total logs per service"
+    }
+  ],
+  "lineage": {
+    "inputs": [
+      {
+        "name": "raw_logs",
+        "path": "data/raw/logs.jsonl"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "service_metrics",
+        "path": "data/processed/service_metrics"
+      }
+    ],
+    "transformations": [
+      "drop rows with null service/response_time_ms",
+      "group by service and aggregate metrics"
+    ]
+  }
+}

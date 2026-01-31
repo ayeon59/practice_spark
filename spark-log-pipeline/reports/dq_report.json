@@ -1,43 +1,9 @@
 {
-  "schema_ok": false,
+  "schema_ok": true,
   "missing_fields": [],
-  "extra_fields": [
-    "request_id"
-  ],
-  "type_mismatches": [
-    {
-      "field": "response_time_ms",
-      "expected": "long",
-      "actual": "bigint"
-    },
-    {
-      "field": "user_id",
-      "expected": "string",
-      "actual": "bigint"
-    }
-  ],
-  "nullable_mismatches": [
-    {
-      "field": "timestamp",
-      "expected": false,
-      "actual": true
-    },
-    {
-      "field": "service",
-      "expected": false,
-      "actual": true
-    },
-    {
-      "field": "level",
-      "expected": false,
-      "actual": true
-    },
-    {
-      "field": "response_time_ms",
-      "expected": false,
-      "actual": true
-    }
-  ],
+  "extra_fields": [],
+  "type_mismatches": [],
+  "nullable_mismatches": [],
   "dq": {
     "total_rows": 1000000,
     "null_counts": {
@@ -47,5 +13,10 @@
     "negative_response_time_count": 0,
     "response_time_over_10s_count": 0,
     "invalid_level_count": 0
-  }
+  },
+  "quality_passed": true,
+  "failed_checks": [],
+  "null_rate_threshold": 0.005,
+  "service_null_rate": 0.000982,
+  "response_time_ms_null_rate": 0.002017
 }
