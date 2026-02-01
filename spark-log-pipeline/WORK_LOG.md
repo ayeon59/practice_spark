@@ -223,6 +223,13 @@
   - `user_load`: 결과 저장 (`data/processed/user_metrics`)
 - `user_output_path` 파라미터 추가
 
+#### 4. 데이터 카탈로그 확장 (`catalog.py`)
+- `user_metrics_df`, `user_output_path` 파라미터 추가
+- `outputs` 배열: service_metrics + user_metrics 모두 포함
+- `lineage.outputs`: 다중 출력 추적
+- `lineage.transformations`: JOIN 변환 단계 추가
+- `user_metrics_schema`: 사용자 메트릭 스키마 자동 문서화
+
 ---
 
 ## 사용된 Spark 기능 요약

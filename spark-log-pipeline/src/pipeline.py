@@ -106,6 +106,8 @@ def run_pipeline(
                 input_path,
                 output_path,
                 schema_version=report.get("schema_version", "unknown"),
+                user_metrics_df=user_metrics,
+                user_output_path=user_output_path,
             ),
         )
         with open(os.path.join(reports_dir, "catalog.json"), "w") as f:

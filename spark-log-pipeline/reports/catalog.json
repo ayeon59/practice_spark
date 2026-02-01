@@ -1,7 +1,7 @@
 {
   "dataset_name": "service_metrics",
   "description": "Service-level aggregated metrics from raw application logs.",
-  "created_at": "2026-01-31T14:52:12.088511Z",
+  "created_at": "2026-02-01T04:36:36.512250Z",
   "schema_version": "v1",
   "input": {
     "path": "data/raw/logs.jsonl",
@@ -11,6 +11,18 @@
     "path": "data/processed/service_metrics",
     "format": "parquet"
   },
+  "outputs": [
+    {
+      "name": "service_metrics",
+      "path": "data/processed/service_metrics",
+      "format": "parquet"
+    },
+    {
+      "name": "user_metrics",
+      "path": "data/processed/user_metrics",
+      "format": "parquet"
+    }
+  ],
   "raw_schema": [
     {
       "name": "level",
@@ -108,11 +120,43 @@
       {
         "name": "service_metrics",
         "path": "data/processed/service_metrics"
+      },
+      {
+        "name": "user_metrics",
+        "path": "data/processed/user_metrics"
       }
     ],
     "transformations": [
       "drop rows with null service/response_time_ms",
-      "group by service and aggregate metrics"
+      "group by service and aggregate metrics",
+      "join users table on user_id and aggregate by plan"
     ]
-  }
+  },
+  "user_metrics_schema": [
+    {
+      "name": "plan",
+      "type": "string",
+      "nullable": true
+    },
+    {
+      "name": "total_logs",
+      "type": "bigint",
+      "nullable": false
+    },
+    {
+      "name": "avg_response_time_ms",
+      "type": "double",
+      "nullable": true
+    },
+    {
+      "name": "error_count",
+      "type": "bigint",
+      "nullable": true
+    },
+    {
+      "name": "error_rate",
+      "type": "double",
+      "nullable": true
+    }
+  ]
 }
