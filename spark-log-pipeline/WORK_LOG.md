@@ -232,6 +232,34 @@
 
 ---
 
+### Phase 7: Delta Lake 통합
+
+**구현 내용:**
+
+#### 1. Delta Lake 설정 (`pipeline.py`)
+- `delta-spark` 패키지 통합 (`configure_spark_with_delta_pip`)
+- Spark 설정 추가:
+  - `spark.sql.extensions`: `io.delta.sql.DeltaSparkSessionExtension`
+  - `spark.sql.catalog.spark_catalog`: `org.apache.spark.sql.delta.catalog.DeltaCatalog`
+
+#### 2. 저장 모듈 확장 (`load.py`)
+- `fmt` 파라미터: 저장 포맷 선택 (`parquet` / `delta`)
+- `mode` 파라미터: 저장 모드 선택 (`overwrite` / `append`)
+- `df.write.format(fmt).mode(mode).save(path)` 형태로 일반화
+
+#### 3. 증분 저장 지원
+- 기존 데이터 존재 시 `append` 모드로 저장
+- 신규 경로일 경우 `overwrite` 모드로 저장
+- Delta Lake의 ACID 트랜잭션 활용
+
+**Delta Lake 도입 이점:**
+- ACID 트랜잭션 보장
+- 스키마 진화(Schema Evolution) 지원
+- Time Travel (데이터 버전 관리)
+- Upsert/Merge 연산 가능
+
+---
+
 ## 사용된 Spark 기능 요약
 
 | 카테고리 | 기능 |
@@ -245,6 +273,7 @@
 | 스키마 | `df.schema`, `StructType`, `printSchema()` |
 | JDBC | `spark.read.format("jdbc")`, PostgreSQL 연동 |
 | 조인 | `df.join()`, LEFT JOIN |
+| Delta Lake | `delta-spark`, ACID 트랜잭션, append/overwrite 모드 |
 
 ---
 

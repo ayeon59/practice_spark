@@ -3,6 +3,7 @@ import os
 import sys
 import time
 from pyspark.sql import SparkSession, functions as F
+from delta import configure_spark_with_delta_pip
 
 from ingestion import load_raw
 from quality import run_quality_checks
@@ -65,19 +66,21 @@ def run_pipeline(
 ) -> int:
     os.makedirs(reports_dir, exist_ok=True)
 
-    spark = (
+    builder = (
         SparkSession.builder
         .appName("spark-log-pipeline")
         .config("spark.jars.packages", "org.postgresql:postgresql:42.7.4")
-        .getOrCreate()
+        .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     )
+    spark = configure_spark_with_delta_pip(builder).getOrCreate()
     spark.sparkContext.setLogLevel("WARN")
 
     try:
         last_ts = load_watermark(state_path)
         df = _run_step("ingestion", lambda: load_raw(spark, input_path, since_ts=last_ts))
 
-        if df.rdd.isEmpty():
+        if df.limit(1).count() == 0:
             print("No new data. Exiting.")
             return 0
 
@@ -93,10 +96,12 @@ def run_pipeline(
             return 1
 
         metrics = _run_step("transform", lambda: build_metrics(df))
-        _run_step("load", lambda: save_metrics(metrics, output_path))
+        service_mode = "append" if os.path.exists(output_path) else "overwrite"
+        _run_step("load", lambda: save_metrics(metrics, output_path, fmt="delta", mode=service_mode))
         users_df = _run_step("rdb_load", lambda: load_users_pg(spark))
         user_metrics = _run_step("user_transform", lambda: build_user_metrics(df, users_df))
-        _run_step("user_load", lambda: save_metrics(user_metrics, user_output_path))
+        user_mode = "append" if os.path.exists(user_output_path) else "overwrite"
+        _run_step("user_load", lambda: save_metrics(user_metrics, user_output_path, fmt="delta", mode=user_mode))
 
         catalog = _run_step(
             "catalog",
